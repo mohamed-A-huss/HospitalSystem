@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Appointment>
+
+<form method="get" asp-action="AllAppointments" class="row mb-4">
+
+    <div class="col-md-4">
+        <input type="text"
+               name="searchName"
+               value="@ViewBag.SearchName"
+               class="form-control"
+               placeholder="Search by doctor name">
+    </div>
+
+    <div class="col-md-4">
+        <select name="specialization" class="form-control">
+            <option value="">All Specializations</option>
+            @foreach (var spec in ViewBag.Specializations as List<string>)
+            {
+                if (ViewBag.specialization == @spec)
+                {
+                    <option value="@spec" selected>@spec</option>
+
+                }
+                else
+                {
+                    <option value="@spec">@spec</option>
+                        
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+
+</form>
+
+<h2 class="text-center mb-4">All Appointments</h2>
+<div class="row">
+    @foreach(var item in Model){
+<div class="col-md-4 mb-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body">
+                <h5 class="card-title text-primary"> Dr. @item.Doctor.Name</h5>
+                <p class="card-text mb-1"><strong>Patient:</strong> @item.PatientName</p>
+                    <p class="card-text mb-1">📅 <strong>Date:</strong> @item.AppointmentDateTime.ToString("MM/dd/yyyy")</p>
+                    <p class="card-text mb-2">⏰ <strong>Time:</strong> @item.AppointmentDateTime.ToString("h:mm tt")</p>
+            <span class="badge bg-warning mb-3">Upcoming</span>
+            
+        </div>
+    </div>
+</div>
+
+
+
+    }
+</div>
+<nav>
+    <ul class="pagination justify-content-center">
+
+        <!-- Previous -->
+        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link" asp-action="AllAppointments" asp-route-page="@(ViewBag.CurrentPage - 1)">Previous</a>
+        </li>
+
+        <!-- Page Numbers -->
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="AllAppointments" asp-route-page="@i">@i</a>
+            </li>
+        }
+
+        <!-- Next -->
+        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages || ViewBag.TotalPages == 0 ? "disabled" : "")">
+            <a class="page-link" asp-action="AllAppointments" asp-route-page="@(ViewBag.CurrentPage + 1)">Next</a>
+        </li>
+
+    </ul>
+</nav>

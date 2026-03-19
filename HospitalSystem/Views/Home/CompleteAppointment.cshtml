@@ -1,0 +1,97 @@
+﻿
+@model Doctor
+
+<h1>Create Appointment with @Model.Name</h1>
+
+<form method="post" asp-action="CreateAppointment">
+
+    <input type="hidden" id="doctorId" name="DoctorId" value="@Model.Id" />
+
+    <div class="form-group">
+        <label>Patient Name:</label>
+        <input type="text" class="form-control" name="PatientName" required>
+    </div>
+
+    <div class="form-group">
+        <label>Appointment Date:</label>
+        <input type="date" id="appointmentDate" class="form-control" name="AppointmentDate" required>
+    </div>
+
+    <div class="form-group">
+        <label>Appointment Time:</label>
+        <select class="form-control" name="AppointmentTime" id="appointmentTime" required>
+        </select>
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Complete Appointment</button>
+</form>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const dateInput = document.getElementById("appointmentDate");
+        const timeSelect = document.getElementById("appointmentTime");
+        const doctorId = document.getElementById("doctorId").value;
+
+        let startHour = 8;
+        let endHour = 17;
+
+        // Generate all slots
+        function generateAllSlots() {
+            let slots = [];
+
+            for (let hour = startHour; hour < endHour; hour++) {
+                slots.push(`${hour}:00`);
+                slots.push(`${hour}:30`);
+            }
+
+            return slots;
+        }
+
+        // Load available slots
+        async function loadAvailableSlots(date) {
+
+            timeSelect.innerHTML = "";
+
+            let response = await fetch(`/Home/GetBookedSlots?doctorId=${doctorId}&date=${date}`);
+            let bookedSlots = await response.json();
+
+            let allSlots = generateAllSlots();
+
+            let availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
+
+            if (availableSlots.length === 0) {
+                let option = document.createElement("option");
+                option.text = "No available slots";
+                timeSelect.appendChild(option);
+                return;
+            }
+
+            availableSlots.forEach(slot => {
+                let option = document.createElement("option");
+                option.value = slot;
+                option.text = slot;
+                timeSelect.appendChild(option);
+            });
+        }
+
+        // Date change event
+        dateInput.addEventListener("change", function () {
+
+            let selectedDate = new Date(this.value);
+            let day = selectedDate.getDay();
+
+            if (day === 5 || day === 6) {
+                alert("Doctors are not available on Friday and Saturday.");
+                this.value = "";
+                timeSelect.innerHTML = "";
+                return;
+            }
+
+            loadAvailableSlots(this.value);
+        });
+
+    });
+</script>
