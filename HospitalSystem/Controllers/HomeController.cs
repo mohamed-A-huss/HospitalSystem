@@ -23,12 +23,12 @@ namespace HospitalSystem.Controllers
             var doctors = _context.Doctors.AsQueryable();
             if (!string.IsNullOrEmpty(searchName))
             {
-                doctors = doctors.Where(d => d.Name.Contains(searchName));
+                doctors = doctors.Where(d => d.Name.ToLower().Contains(searchName.Trim().ToLower()));
             }
 
             if (!string.IsNullOrEmpty(specialization))
             {
-                doctors = doctors.Where(d => d.Specialization.Contains(specialization));
+                doctors = doctors.Where(d => d.Specialization.ToLower().Contains(specialization.Trim().ToLower()));
             }
             int pageSize = 6;
             int totalDoctors = doctors.Count();
@@ -105,17 +105,17 @@ namespace HospitalSystem.Controllers
 
             return Json(bookedTimes);
         }
-        public IActionResult AllAppointments(string searchName, string specialization, int page = 1)
+        public IActionResult AllAppointments(string? searchName, string? specialization, int page = 1)
         {
             var appointments = _context.Appointments.Include(e => e.Doctor).AsQueryable();
             if (!string.IsNullOrEmpty(searchName))
             {
-                appointments = appointments.Where(d => d.Doctor.Name.Contains(searchName));
+                appointments = appointments.Where(d => d.Doctor.Name.ToLower().Contains(searchName.Trim().ToLower()));
             }
 
             if (!string.IsNullOrEmpty(specialization))
             {
-                appointments = appointments.Where(d => d.Doctor.Specialization.Contains(specialization));
+                appointments = appointments.Where(d => d.Doctor.Specialization.ToLower().Contains(specialization.Trim().ToLower()));
             }
             int pageSize = 6;
             int totalappointments = appointments.Count();
